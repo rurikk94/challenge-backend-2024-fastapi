@@ -28,14 +28,18 @@ class Employee(Base):
             return None
         return self._device_group.name
 
-    enrollments: Mapped["Enrollments"] = relationship("Enrollments", uselist=False)
+    enrollments: Mapped[Optional["Enrollments"]] = relationship("Enrollments", uselist=False)
 
 class Enrollments(Base):
     __tablename__ = "enrollments"
 
     employee_id: Mapped[int] =     Column(Integer, ForeignKey("employee.id"), primary_key=True)
-    pin:         Mapped[Optional[str]] =     Column(String)
-    face:        Mapped[Optional[bytes]] =   Column(BYTEA)
+    pin:         Mapped[Optional[str]] =     Column(String, nullable=True)
+    face:        Mapped[Optional[bytes]] =   Column(BYTEA, nullable=True)
+
+    def is_same_pin(self, pin: str | int) -> bool:
+        pin = int(pin) if isinstance(pin, str) else pin
+        return int(self.pin) == pin
 
 class DeviceGroup(Base):
     __tablename__ = "device_group"
@@ -140,8 +144,8 @@ class Punch(Base):
     dni:         Mapped[str] =                 Column(String)
     status:      Mapped[str] =                 Column(String)
     employee_id: Mapped[Optional[int]] =       Column(Integer, ForeignKey("employee.id"))
-    pin:         Mapped[Optional[str]] =       Column(String)
-    photo:       Mapped[Optional[bytes]] =     Column(BYTEA)
+    pin:         Mapped[Optional[str]] =       Column(String, nullable=True)
+    photo:       Mapped[Optional[bytes]] =     Column(BYTEA, nullable=True)
     in_out:      Mapped[bool] =                 Column(Boolean, default=True)
 
     @property

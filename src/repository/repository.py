@@ -5,6 +5,8 @@ from sqlalchemy.orm import Session
 
 from src.exceptions import NotFoundException
 
+from src.schemas.schemas import InputModel
+
 def get_all(db: Session, model: DeclarativeMeta, **kwargs) -> List[DeclarativeMeta]:
     query = db.query(model)
     if "between" in kwargs:
@@ -22,3 +24,11 @@ def get_by_id(db: Session, model: DeclarativeMeta, id: int) -> DeclarativeMeta:
     if data == None:
         raise NotFoundException(f"{model.__tablename__} not found").with_traceback(sys.exc_info()[2])
     return data
+
+
+def create(db: Session, model: DeclarativeMeta, data: InputModel) -> DeclarativeMeta:
+    new_data = model(**data.__dict__)
+    db.add(new_data)
+    db.commit()
+    db.refresh(new_data)
+    return new_data
