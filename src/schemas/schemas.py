@@ -1,17 +1,20 @@
 
 from typing import Generic, List, Optional, TypeVar
-from pydantic import AliasPath, BaseModel, Field
+from pydantic import AliasPath, BaseModel, ConfigDict, Field
 from datetime import date, datetime
 
 from src.models.schemas import PunchTypeEnum
 
 
 M = TypeVar("M", bound=BaseModel)
+T = TypeVar('T', bound=BaseModel)
 
 class ResponseModel(BaseModel, Generic[M]):
     status: Optional[str] = "success"
     data: List[M] | M
 
+class InputModel(BaseModel, Generic[T]):
+    data: T
 
 class LoginModel(BaseModel):
     username: str
@@ -36,6 +39,10 @@ class DeviceGroupInputModel(DeviceGroupModel):
 
 class DeviceGroupDBModel(DeviceGroupModel):
     id: int
+    model_config = ConfigDict(from_attributes=True)
+
+class PinModel(BaseModel):
+    pin: int
 
 class PunchTypeValuesModel(BaseModel):
     pin: Optional[str]
@@ -50,7 +57,7 @@ class DevicesDBModel(BaseModel):
     name: str
     location: str
     timezone: str
-    device_group: str
+    device_group: Optional[str]
     punch_type: PunchTypeModel
 
 class DeviceModel(PunchTypeModel, BaseModel):
@@ -62,11 +69,15 @@ class DeviceModel(PunchTypeModel, BaseModel):
 class DeviceDBModel(DeviceModel):
     id: int
 
-class PunchPinModel(BaseModel):
-    dni: str
-    pin: str
+    model_config = ConfigDict(from_attributes=True)
 
-class PunchPhotoModel(BaseModel):
+class PunchModel(BaseModel):
+    device_id: int
+class PunchPinModel(PunchModel):
+    dni: str
+    pin: int
+
+class PunchPhotoModel(PunchModel):
     dni: str
     photo: bytes
 
@@ -80,9 +91,9 @@ class TokenModel(BaseModel):
 
 class EmployeeDBModel(EmployeeDataModel, BaseModel):
     id: int
-    enrollments: PunchTypeValuesModel
-    device_group_id: int
-    device_group: str
+    enrollments: Optional[PunchTypeValuesModel]
+    device_group_id: Optional[int]
+    device_group: Optional[str]
 
 class DniModel(BaseModel):
     dni: str
@@ -97,9 +108,9 @@ class TimecardModel(BaseModel):
     punch_in: List[datetime]
     punch_out: List[datetime]
 
-class PunchModel(BaseModel):
+class PunchDBModel(BaseModel):
     id: int
-    device_id: int
+    device_id: Optional[int]
     timezone: str
     punch_dtm: datetime
     punch_type: PunchTypeEnum

@@ -13,17 +13,19 @@ class Employee(Base):
     __tablename__ = "employee"
 
     id:         Mapped[int] =    Column(Integer, primary_key=True, index=True)
-    dni:        Mapped[str] =    Column(String)
-    fullname:   Mapped[str] =    Column(String)
-    email:      Mapped[str] =    Column(String)
-    device_group_id: Mapped[int] = Column(Integer, ForeignKey("device_group.id"))
+    dni:        Mapped[str] =    Column(String, nullable=False)
+    fullname:   Mapped[str] =    Column(String, nullable=False)
+    email:      Mapped[str] =    Column(String, nullable=False)
+    device_group_id: Mapped[int] = Column(Integer, ForeignKey("device_group.id"), nullable=True)
 
-    _device_group: Mapped["DeviceGroup"] = relationship("DeviceGroup", uselist=False)
+    _device_group: Mapped[Optional["DeviceGroup"]] = relationship("DeviceGroup", uselist=False, passive_deletes=True, cascade="all, delete")
 
     _punchs: Mapped[List["Punch"]] = relationship("Punch")
 
     @property
     def device_group(self):
+        if self._device_group is None:
+            return None
         return self._device_group.name
 
     enrollments: Mapped["Enrollments"] = relationship("Enrollments", uselist=False)
@@ -68,11 +70,11 @@ class Devices(Base):
     name:       Mapped[str] =    Column(String)
     location:   Mapped[str] =    Column(String)
     timezone:   Mapped[str] =    Column(String)
-    device_group_id: Mapped[int] = Column(Integer, ForeignKey("device_group.id"))
+    device_group_id: Mapped[int] = Column(Integer, ForeignKey("device_group.id"), nullable=True)
 
-    punch_type: Mapped["DevicePunchType"] = relationship("DevicePunchType", uselist=False)
+    punch_type: Mapped["DevicePunchType"] = relationship("DevicePunchType", uselist=False, passive_deletes=True, cascade="all, delete")
 
-    __device_group: Mapped["DeviceGroup"] = relationship("DeviceGroup", uselist=False)
+    _device_group: Mapped["DeviceGroup"] = relationship("DeviceGroup", uselist=False, passive_deletes=True, cascade="all, delete")
 
     @property
     def pin(self):
@@ -84,7 +86,13 @@ class Devices(Base):
 
     @property
     def device_group(self):
-        return self.__device_group.name
+        if self._device_group is None:
+            return None
+        return self._device_group.name
+
+    @device_group.setter
+    def device_group(self, value):
+        self.device_group_id = value
 
 class DevicePunchType(Base):
     __tablename__ = "punch_type"

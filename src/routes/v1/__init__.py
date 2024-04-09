@@ -4,7 +4,9 @@ from src.routes.v1.token import _token
 from src.routes.v1.devices import _devices
 from src.routes.v1.device_groups import _device_groups
 from src.routes.v1.employees import _employees
+from src.routes.v1.enroll import _enroll
 from src.routes.v1.timecards import _timecards
+from src.routes.v1.punch import _punch
 
 
 _v1 = APIRouter()
