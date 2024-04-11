@@ -9,7 +9,7 @@ services:
     expose:
       - 5432
     volumes:
-      - ~/apps/challenge_db:/var/lib/postgresql/data
+      - ~/apps/challenge_db_test:/var/lib/postgresql/data
     environment:
       - POSTGRES_PASSWORD=password
       - POSTGRES_USER=user
@@ -20,14 +20,14 @@ services:
       timeout: 20s
       retries: 5
 
-  challenge:
-    build:
-      dockerfile: Dockerfile
-    env_file: .env
-    ports:
-      - "${PORT}:${PORT}"
-    expose:
-      - "${PORT}"
-    depends_on:
-      postgres:
-        condition: service_healthy
+#   challenge:
+#     build:
+#       dockerfile: Dockerfile
+#     env_file: .env
+#     ports:
+#       - "${PORT}:${PORT}"
+#     expose:
+#       - "${PORT}"
+#     depends_on:
+#       postgres:
+#         condition: service_healthy
