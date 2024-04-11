@@ -1,6 +1,4 @@
-from io import BytesIO
-
-import face_recognition as fr
+import face_recognition.api as fr
 import numpy as np
 from PIL import Image
 
@@ -11,7 +9,6 @@ def encode_photo(im: Image.Image) -> list[list[float]]:
         ^ and extract the data required to match faces
         * Returns a list of face-recognition encodings (list of float)
     '''
-    # im = Image.open(image).convert("RGB")
     return [a.tolist() for a in
         fr.face_encodings(
             np.array(im),
