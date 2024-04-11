@@ -39,7 +39,10 @@ mkdocs-material = "^9.5.15"
 [tool.pytest.ini_options]
 minversion = "6.0"
 pythonpath = [
-    "src",
+    ".",
+]
+env_files = [
+    ".env"
 ]
 
 [build-system]
@@ -54,7 +57,7 @@ fastapi-docker-down = "docker-compose down"
 black-format = "black ."
 black-check = "black . --check --diff -v"
 test-unit = ["_test_unit", "_coverage_html"]
-_test_unit = "coverage run -m pytest tests/unit"
+_test_unit = "coverage run -m pytest tests"
 _coverage_html = "coverage html"
 
 [tool.coverage.run]
