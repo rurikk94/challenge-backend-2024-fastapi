@@ -8,6 +8,8 @@ ENV PATH="/opt/venv/bin:$PATH"
 
 # RUN apt-get update apt-get -y install libpq-dev gcc
 
+RUN apt-get update && apt-get install -y build-essential cmake
+
 RUN pip install --upgrade pip
 RUN pip install --upgrade wheel
 

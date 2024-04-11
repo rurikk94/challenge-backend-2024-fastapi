@@ -1,5 +1,7 @@
+import base64
 from datetime import datetime, date, time, timezone
 import enum
+import io
 from typing import List, Optional
 from sqlalchemy import Boolean, Column, Date, DateTime, ForeignKey, Integer, String, Time, Enum
 from sqlalchemy.orm import Mapped, relationship
@@ -8,6 +10,8 @@ from sqlalchemy.dialects.postgresql import BYTEA
 import pytz
 
 from src.database.database import Base
+import src.face_recognition as fr
+from PIL import Image
 
 class Employee(Base):
     __tablename__ = "employee"
@@ -28,7 +32,39 @@ class Employee(Base):
             return None
         return self._device_group.name
 
-    enrollments: Mapped[Optional["Enrollments"]] = relationship("Enrollments", uselist=False)
+    _enrollments: Mapped[Optional["Enrollments"]] = relationship("Enrollments", uselist=False)
+
+    def has_enrollments(self) -> bool:
+        return True if self._enrollments else False
+
+    def has_face_enrollment(self) -> bool:
+        return True if self._enrollments.face else False
+
+    def has_pin_enrollment(self) -> bool:
+        return True if self._enrollments.pin else False
+
+    def has_same_face(self, punch_photo: bytes) -> bool:
+        return self._enrollments.is_same_photo(punch_photo)
+
+    def has_same_pin(self, pin: str | int) -> bool:
+        return self._enrollments.is_same_pin(pin)
+
+    @property
+    def enrollments(self):
+        if self._enrollments:
+            face = True if self._enrollments.face else False
+            return {
+                "employee_id": self._enrollments.employee_id,
+                "pin": self._enrollments.pin,
+                "face": face
+                }
+        return None
+
+    @enrollments.setter
+    def enrollments(self, value):
+        self._enrollments = value
+
+
 
 class Enrollments(Base):
     __tablename__ = "enrollments"
@@ -40,6 +76,27 @@ class Enrollments(Base):
     def is_same_pin(self, pin: str | int) -> bool:
         pin = int(pin) if isinstance(pin, str) else pin
         return int(self.pin) == pin
+
+    def is_same_photo(self, punch_photo: bytes) -> bool:
+        def porcentaje_true(lista: List[bool]):
+            total = len(lista)
+            true_count = sum(1 for elemento in lista if elemento)  # Contar cuántos elementos son True
+            porcentaje = (true_count / total) * 100
+            return porcentaje
+
+
+        # image = Image.open(image).convert("RGB")
+        # image = Image.frombytes("RGB", (640, 480), punch_photo)
+        # image = Image.open(io.BytesIO(base64.b64decode(punch_photo)))
+
+
+        punch_face = fr.encode_photo(punch_photo)
+        import pickle
+        enroll = pickle.loads(self.face)
+        match: List[bool] = fr.match(punch_face, enroll)
+        if porcentaje_true(match) >= 70:
+            return True
+        return False
 
 class DeviceGroup(Base):
     __tablename__ = "device_group"

@@ -46,7 +46,7 @@ class PinModel(BaseModel):
 
 class PunchTypeValuesModel(BaseModel):
     pin: Optional[str]
-    face: Optional[bytes]
+    face: Optional[bool]
 
 class PunchTypeModel(BaseModel):
     pin: bool
@@ -79,7 +79,7 @@ class PunchPinModel(PunchModel):
 
 class PunchPhotoModel(PunchModel):
     dni: str
-    photo: bytes
+    # photo: bytes
 
 class EmployeeDataModel(BaseModel):
     dni: str
@@ -98,8 +98,8 @@ class EmployeeDBModel(EmployeeDataModel, BaseModel):
 class DniModel(BaseModel):
     dni: str
 
-class PhotoModel(BaseModel):
-    photo: bytes
+class FaceModel(BaseModel):
+    face: bytes | bool
 
 class TimecardModel(BaseModel):
     id: int

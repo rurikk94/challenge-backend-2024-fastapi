@@ -62,7 +62,7 @@ async def device_update(
     device_punch_type: DevicePunchType = get_by_id(db, DevicePunchType, device_id)
     device_punch_type.update_from_dict(device_data.model_dump(include=["pin", "face"]))
     db.commit()
-    device = await get_device_by_id(device_id.id, db)
+    device = await get_device_by_id(device_id, db)
     return {"data": device}
 
 @_devices.delete("/{device_id}", tags=["devices"], response_model=ResponseModel[DeviceDBModel])
