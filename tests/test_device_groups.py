@@ -7,18 +7,23 @@ from src.main import app
 
 client = TestClient(app)
 
+
 @pytest.fixture(scope="module", autouse=True)
 def create_device_group_data():
     """Let's create the test data"""
-    device_group = client.post("/v1/device_groups/", json={
-        "name": "nuevo abril device_group",
-        "description": "creado por postman en abril",
-        "devices": [],
-        "employees": []
-    })
+    device_group = client.post(
+        "/v1/device_groups/",
+        json={
+            "name": "nuevo abril device_group",
+            "description": "creado por postman en abril",
+            "devices": [],
+            "employees": [],
+        },
+    )
     device_group = device_group.json()
     yield device_group
     client.delete(f"/v1/device_groups/{device_group['data']['id']}")
+
 
 def test_get_device_groups():
     """Test get device groups."""

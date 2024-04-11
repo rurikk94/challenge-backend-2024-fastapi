@@ -7,17 +7,22 @@ from src.main import app
 
 client = TestClient(app)
 
+
 @pytest.fixture(scope="module", autouse=True)
 def create_employees():
     """Let's create the test data"""
-    employee = client.post("/v1/employees/", json={
-        "dni": "15.723.569-9",
-        "fullname": "Clark Brereton",
-        "email": "c.b@mail.com"
-    })
+    employee = client.post(
+        "/v1/employees/",
+        json={
+            "dni": "15.723.569-9",
+            "fullname": "Clark Brereton",
+            "email": "c.b@mail.com",
+        },
+    )
     employee = employee.json()
     yield employee
     client.delete(f"/v1/employees/{employee['data']['id']}")
+
 
 def test_get_employees():
     """Test get employees."""
