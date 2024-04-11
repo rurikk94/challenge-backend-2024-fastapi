@@ -8,9 +8,9 @@ on:
   #   branches: [ 'main' ]
 
 env:
-  PROJECT_ID: ${{ secrets.PROJECT_ID }}
-  SERVICE: ${{ secrets.SERVICE_NAME }}
-  REGION: ${{ secrets.REGION_NAME }}
+  PROJECT_ID: photos-dev-408720
+  SERVICE: challenge
+  REGION: us-central1
 
 jobs:
 
@@ -107,7 +107,7 @@ jobs:
         id: deploy
         uses: 'google-github-actions/deploy-cloudrun@v0'
         with:
-          service: ${{ env.SERVICE }
+          service: ${{ env.SERVICE }}
           region: ${{ env.REGION }}
           source: ./src
 
