@@ -110,7 +110,7 @@ jobs:
 
       - name: Build and tag the docker image
         run: |-
-            docker build -t ${{ env.REGION }}-docker.pkg.dev/${{ env.PROJECT_ID }}/repo/${{ env.SERVICE }}:latest
+            docker build -t ${{ env.REGION }}-docker.pkg.dev/${{ env.PROJECT_ID }}/repo/${{ env.SERVICE }}:latest .
 
       - name: Push the image to the Google Artifact Registry (GAR)
         run: |-
