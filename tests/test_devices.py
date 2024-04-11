@@ -1,4 +1,5 @@
 """Test devices."""
+
 import random
 from fastapi.testclient import TestClient
 from src.main import app
