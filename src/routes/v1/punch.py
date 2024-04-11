@@ -1,4 +1,5 @@
 """This module contains the enroll routes."""
+
 import base64
 from datetime import datetime
 from io import BytesIO
@@ -8,7 +9,12 @@ from sqlalchemy.orm import Session
 
 from src.models.schemas import Punch, PunchTypeEnum
 from src.database.database import get_db
-from src.schemas.schemas import PunchPinModel, ResponseModel, PunchDBModel, PunchPhotoModel
+from src.schemas.schemas import (
+    PunchPinModel,
+    ResponseModel,
+    PunchDBModel,
+    PunchPhotoModel,
+)
 from .employees import get_employee_by_dni
 from .devices import get_device_by_id
 from src.exceptions import NotFoundException
@@ -17,13 +23,14 @@ from PIL import Image
 
 _punch = APIRouter()
 
+
 @_punch.post("/face", response_model=ResponseModel[PunchDBModel])
 async def create_punch_photo(
     # data: PunchPhotoModel,
     photo: Annotated[UploadFile | str, Form()],
     dni: Annotated[str, Form()],
     device_id: Annotated[int, Form()],
-    db: Session = Depends(get_db)
+    db: Session = Depends(get_db),
 ):
     """Create a new photo punch for an employee."""
     now = datetime.utcnow()
@@ -42,7 +49,7 @@ async def create_punch_photo(
 
     if isinstance(photo, str):
         # Decodificar la cadena base64
-        decoded_data = base64.b64decode(photo.split(',')[1])
+        decoded_data = base64.b64decode(photo.split(",")[1])
 
         # Convertir los datos decodificados en un objeto BytesIO
         image_data = BytesIO(decoded_data)
@@ -58,11 +65,19 @@ async def create_punch_photo(
         if employee_id and not employee.has_enrollments():
             raise ValueError("Employee has no enrollments.")
 
-        if employee_id and employee.has_enrollments() and not employee.has_face_enrollment():
+        if (
+            employee_id
+            and employee.has_enrollments()
+            and not employee.has_face_enrollment()
+        ):
             raise ValueError("Employee has no photo.")
 
-        if (employee_id and employee.has_enrollments() and employee.has_face_enrollment()
-        and not employee.has_same_face(photo_contents)):
+        if (
+            employee_id
+            and employee.has_enrollments()
+            and employee.has_face_enrollment()
+            and not employee.has_same_face(photo_contents)
+        ):
             raise ValueError("Face dont match.")
     except Exception as e:
         status += f" {str(e)}"
@@ -96,18 +111,16 @@ async def create_punch_photo(
         employee_id=employee_id,
         pin=None,
         photo=None,
-        in_out=True
+        in_out=True,
     )
 
     db.add(punch)
     db.commit()
     return {"data": punch}
 
+
 @_punch.post("/pin", response_model=ResponseModel[PunchDBModel])
-async def create_punch(
-    data: PunchPinModel,
-    db: Session = Depends(get_db)
-):
+async def create_punch(data: PunchPinModel, db: Session = Depends(get_db)):
     """Create a new pin for an employee."""
     now = datetime.utcnow()
     status = ""
@@ -126,11 +139,19 @@ async def create_punch(
         if employee_id and not employee.has_enrollments():
             raise ValueError("Employee has no enrollments.")
 
-        if employee_id and employee.has_enrollments() and not employee.has_pin_enrollment():
+        if (
+            employee_id
+            and employee.has_enrollments()
+            and not employee.has_pin_enrollment()
+        ):
             raise ValueError("Employee has no pin.")
 
-        if (employee_id and employee.has_enrollments() and employee.has_pin_enrollment()
-        and not employee.has_same_pin(data.pin)):
+        if (
+            employee_id
+            and employee.has_enrollments()
+            and employee.has_pin_enrollment()
+            and not employee.has_same_pin(data.pin)
+        ):
             raise ValueError("Invalid PIN.")
     except Exception as e:
         status += f" {str(e)}"
@@ -154,7 +175,6 @@ async def create_punch(
     if status == "":
         status = "1"
 
-
     punch = Punch(
         device_id=device_id,
         timezone=timezone,
@@ -165,7 +185,7 @@ async def create_punch(
         employee_id=employee_id,
         pin=data.pin,
         photo=None,
-        in_out=True
+        in_out=True,
     )
 
     db.add(punch)

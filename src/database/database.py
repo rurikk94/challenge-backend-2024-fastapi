@@ -9,7 +9,9 @@ from sqlalchemy.ext.declarative import declarative_base
 
 from src.config import config
 
-url: str = f"{config.dbdriver}://{config.dbuser}:{config.dbpass}@{config.dbhost}/{config.dbschema}"
+url: str = (
+    f"{config.dbdriver}://{config.dbuser}:{config.dbpass}@{config.dbhost}/{config.dbschema}"
+)
 
 if config.connection_type == "socket":
     url: str = "{}://{}:{}@/{}?unix_socket={}&charset=utf8mb4".format(
@@ -26,11 +28,14 @@ if config.connection_type == "socket":
         .replace("-", "%2d"),
     )
 
-engine: Engine = create_engine(url, echo=config.dbdebug, pool_size=5, max_overflow=0, pool_timeout=30)
+engine: Engine = create_engine(
+    url, echo=config.dbdebug, pool_size=5, max_overflow=0, pool_timeout=30
+)
 
 SessionLocal: Session = sessionmaker(autocommit=False, autoflush=False, bind=engine)
 
 base: DeclarativeMeta = declarative_base()
+
 
 class Base(base):
     __abstract__ = True
@@ -38,9 +43,10 @@ class Base(base):
     # enable:         Mapped[bool] =   Column(Boolean, nullable=False, default=True)
 
     def update_from_dict(self, data: dict):
-        """ Update from dict the objects values """
+        """Update from dict the objects values"""
         for key in data:
             setattr(self, key, data[key])
+
 
 def get_db() -> Generator[Session, None, None]:
     try:

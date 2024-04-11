@@ -11,8 +11,9 @@ import uuid
 
 _token = APIRouter()
 
+
 @_token.post("/", response_model=ResponseModel[TokenModel])
 async def token(data: LoginModel):
     if data.username != "admin":
         raise HTTPException(status_code=401, detail="Usuario no autorizado")
-    return {"data": {"token": uuid.uuid4().hex }}
+    return {"data": {"token": uuid.uuid4().hex}}

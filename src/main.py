@@ -31,14 +31,23 @@ app.include_router(_v1, prefix="/v1")
 Base.metadata.create_all(bind=engine)
 
 from starlette.requests import Request as StarletteRequest
+
+
 @app.exception_handler(Exception)
 async def exception_handler(request: StarletteRequest, exc: Exception):
     # print(traceback.format_exc())
     print(f"{request.method=} {request.url=}")
-    return JSONResponse(content={"status":"error", "message":jsonable_encoder(str(exc))}, status_code=exc.status_code)
+    return JSONResponse(
+        content={"status": "error", "message": jsonable_encoder(str(exc))},
+        status_code=exc.status_code,
+    )
+
 
 @app.exception_handler(StarletteHTTPException)
 async def http_exception_handler(request: StarletteRequest, exc: Exception):
     # print(traceback.format_exc())
     print(f"{request.method=} {request.url=}")
-    return JSONResponse(content={"status":"error", "message":jsonable_encoder(exc.detail)}, status_code=exc.status_code)
+    return JSONResponse(
+        content={"status": "error", "message": jsonable_encoder(exc.detail)},
+        status_code=exc.status_code,
+    )

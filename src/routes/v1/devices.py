@@ -7,7 +7,12 @@ from sqlalchemy.orm import Session
 from src.models.schemas import DevicePunchType, Devices
 from src.database.database import get_db
 from src.repository.repository import get_all, get_by_id
-from src.schemas.schemas import DevicesDBModel, ResponseModel, DeviceDBModel, DeviceModel
+from src.schemas.schemas import (
+    DevicesDBModel,
+    ResponseModel,
+    DeviceDBModel,
+    DeviceModel,
+)
 
 
 _devices = APIRouter()
@@ -19,10 +24,13 @@ async def devices(db: Session = Depends(get_db)):
     devices = get_all(db, Devices)
     return {"data": devices}
 
-@_devices.get("/{device_id}", tags=["devices"], response_model=ResponseModel[DeviceDBModel])
+
+@_devices.get(
+    "/{device_id}", tags=["devices"], response_model=ResponseModel[DeviceDBModel]
+)
 async def device_by_id(
     device_id: Annotated[int, Path(title="The ID of the item to get", gt=0)],
-    db: Session = Depends(get_db)
+    db: Session = Depends(get_db),
 ):
     """Get a device by ID."""
     device = await get_device_by_id(device_id, db)
@@ -40,7 +48,9 @@ async def device_create(device: DeviceModel, db: Session = Depends(get_db)):
 
     new_device = Devices(**device.model_dump(exclude=["pin", "face"]))
     db.add(new_device)
-    new_device_punch_type = DevicePunchType(**device.model_dump(include=["pin", "face"]))
+    new_device_punch_type = DevicePunchType(
+        **device.model_dump(include=["pin", "face"])
+    )
     db.flush()
     new_device_punch_type.device_id = new_device.id
     db.add(new_device_punch_type)
@@ -49,11 +59,14 @@ async def device_create(device: DeviceModel, db: Session = Depends(get_db)):
     device = await get_device_by_id(new_device.id, db)
     return {"data": device}
 
-@_devices.put("/{device_id}", tags=["devices"], response_model=ResponseModel[DeviceDBModel])
+
+@_devices.put(
+    "/{device_id}", tags=["devices"], response_model=ResponseModel[DeviceDBModel]
+)
 async def device_update(
     device_id: Annotated[int, Path(title="The ID of the item to get", gt=0)],
     device_data: DeviceModel,
-    db: Session = Depends(get_db)
+    db: Session = Depends(get_db),
 ):
     """Update a device."""
     device: Devices = get_by_id(db, Devices, device_id)
@@ -65,10 +78,13 @@ async def device_update(
     device = await get_device_by_id(device_id, db)
     return {"data": device}
 
-@_devices.delete("/{device_id}", tags=["devices"], response_model=ResponseModel[DeviceDBModel])
+
+@_devices.delete(
+    "/{device_id}", tags=["devices"], response_model=ResponseModel[DeviceDBModel]
+)
 async def device_delete(
     device_id: Annotated[int, Path(title="The ID of the item to get", gt=0)],
-    db: Session = Depends(get_db)
+    db: Session = Depends(get_db),
 ):
     """Delete a device."""
     device: Devices = get_by_id(db, Devices, device_id)

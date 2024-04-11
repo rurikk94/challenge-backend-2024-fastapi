@@ -18,10 +18,13 @@ async def employees(db: Session = Depends(get_db)):
     empleados = get_all(db, Employee)
     return {"data": empleados}
 
-@_employees.get("/{employee_id}", tags=["employees"], response_model=ResponseModel[EmployeeDBModel])
+
+@_employees.get(
+    "/{employee_id}", tags=["employees"], response_model=ResponseModel[EmployeeDBModel]
+)
 async def employee_by_id(
     employee_id: Annotated[int, Path(title="The ID of the item to get", gt=0)],
-    db: Session = Depends(get_db)
+    db: Session = Depends(get_db),
 ):
     """Get an employee by ID."""
     employee = await get_employee_by_id(employee_id, db)
@@ -32,9 +35,11 @@ async def get_employee_by_id(employee_id, db) -> Employee:
     """Get an employee by ID."""
     return get_by_id(db, Employee, employee_id)
 
+
 async def get_employee_by_dni(dni, db) -> Employee:
     """Get an employee by DNI."""
     return db.query(Employee).filter(Employee.dni == dni).first()
+
 
 @_employees.post("/", tags=["employees"], response_model=ResponseModel[EmployeeDBModel])
 async def employee_create(employee: EmployeeDataModel, db: Session = Depends(get_db)):
@@ -45,11 +50,14 @@ async def employee_create(employee: EmployeeDataModel, db: Session = Depends(get
     db.commit()
     return {"data": new_employee}
 
-@_employees.put("/{employee_id}", tags=["employees"], response_model=ResponseModel[EmployeeDBModel])
+
+@_employees.put(
+    "/{employee_id}", tags=["employees"], response_model=ResponseModel[EmployeeDBModel]
+)
 async def employee_update(
     employee_id: Annotated[int, Path(title="The ID of the item to get", gt=0)],
     employee_data: EmployeeDataModel,
-    db: Session = Depends(get_db)
+    db: Session = Depends(get_db),
 ):
     """Update an employee."""
     employee: Employee = get_by_id(db, Employee, employee_id)
@@ -57,10 +65,13 @@ async def employee_update(
     db.commit()
     return {"data": employee}
 
-@_employees.delete("/{employee_id}", tags=["employees"], response_model=ResponseModel[EmployeeDBModel])
+
+@_employees.delete(
+    "/{employee_id}", tags=["employees"], response_model=ResponseModel[EmployeeDBModel]
+)
 async def employee_delete(
     employee_id: Annotated[int, Path(title="The ID of the item to get", gt=0)],
-    db: Session = Depends(get_db)
+    db: Session = Depends(get_db),
 ):
     """Delete an employee."""
     employee: Employee = get_by_id(db, Employee, employee_id)
