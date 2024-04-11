@@ -7,6 +7,11 @@ on:
   # pull_request:
   #   branches: [ 'main' ]
 
+env:
+  PROJECT_ID: ${{ secrets.PROJECT_ID }}
+  SERVICE: ${{ secrets.SERVICE_NAME }}
+  REGION: ${{ secrets.REGION_NAME }}
+
 jobs:
 
   code-quality:
@@ -76,6 +81,35 @@ jobs:
         with:
           name: code-coverage-report
           path: htmlcov
+
+  deploy:
+    name: Deploy on Cloud Run
+    needs: test
+    runs-on: ubuntu-latest
+    permissions:
+      contents: 'read'
+      id-token: 'write'
+      
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v2
+
+      - name: Google Auth
+        id: auth
+        uses: 'google-github-actions/auth@v0'
+        with:          
+          workload_identity_provider: '${{ secrets.WIF_PROVIDER }}' # e.g. - projects/123456789/locations/global/workloadIdentityPools/my-pool/providers/my-provider
+          service_account: '${{ secrets.WIF_SERVICE_ACCOUNT }}' # e.g. - my-service-account@my-project.iam.gserviceaccount.com
+         # credentials_json: '${{ secrets.SA_CREDENTIALS }}'
+        
+
+      - name: Deploy to Cloud Run
+        id: deploy
+        uses: 'google-github-actions/deploy-cloudrun@v0'
+        with:
+          service: ${{ env.SERVICE }
+          region: ${{ env.REGION }}
+          source: ./src
 
 #   docker:
 #     name: Build and Push to DockerHub
