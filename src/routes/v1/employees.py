@@ -75,6 +75,7 @@ async def employee_delete(
 ):
     """Delete an employee."""
     employee: Employee = get_by_id(db, Employee, employee_id)
+    d_data = EmployeeDBModel.model_validate(employee)
     db.delete(employee)
     db.commit()
-    return {"data": employee}
+    return {"data": d_data}

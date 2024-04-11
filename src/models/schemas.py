@@ -31,7 +31,7 @@ class Employee(Base):
     dni: Mapped[str] = Column(String, nullable=False)
     fullname: Mapped[str] = Column(String, nullable=False)
     email: Mapped[str] = Column(String, nullable=False)
-    device_group_id: Mapped[int] = Column(
+    device_group_id: Mapped[Optional[int]] = Column(
         Integer, ForeignKey("device_group.id"), nullable=True
     )
 
@@ -42,7 +42,7 @@ class Employee(Base):
     _punchs: Mapped[List["Punch"]] = relationship("Punch")
 
     @property
-    def device_group(self):
+    def device_group(self) -> Optional[str]:
         if self._device_group is None:
             return None
         return self._device_group.name

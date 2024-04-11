@@ -88,7 +88,7 @@ async def device_delete(
 ):
     """Delete a device."""
     device: Devices = get_by_id(db, Devices, device_id)
-    d_data = DeviceDBModel.from_orm(device)
+    d_data = DeviceDBModel.model_validate(device)
     db.delete(device)
     db.commit()
     return {"data": d_data}

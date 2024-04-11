@@ -117,6 +117,7 @@ class EmployeeDBModel(EmployeeDataModel, BaseModel):
     enrollments: Optional[PunchTypeValuesModel]
     device_group_id: Optional[int]
     device_group: Optional[str]
+    model_config = ConfigDict(from_attributes=True)
 
 
 class DniModel(BaseModel):
