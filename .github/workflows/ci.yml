@@ -128,8 +128,8 @@ jobs:
             --platform "managed" \
             --service-account ${{ secrets.WIF_SERVICE_ACCOUNT }} \
             --port 8080 \
-            --quiet \
-            && gcloud run services update-traffic challenge --to-latest
+            --quiet
+        # && gcloud run services update-traffic challenge --to-latest
 
 
 

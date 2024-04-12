@@ -22,7 +22,7 @@ class Settings(BaseSettings):
     cors_allow_methods: List[str] = ["*"]
     cors_allow_headers: List[str] = ["*"]
 
-    version: str = "240411"
+    version: str = "240411.2"
 
 
 config = Settings()
